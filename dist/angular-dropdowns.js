@@ -79,6 +79,7 @@
           DropdownService.register($element);
 
           this.select = function (selected) {
+            console.log("SELECTED 2");
             if (!angular.equals(selected, $scope.dropdownModel)) {
                 $scope.dropdownModel = selected;
             }
@@ -88,6 +89,7 @@
           };
 
           $element.bind('click', function (event) {
+            console.log("CLICK 2");
             event.stopPropagation();
             if (!$scope.dropdownDisabled) {
               DropdownService.toggleActive($element);
@@ -137,7 +139,8 @@
           dropdownModel: '=',
           dropdownItemLabel: '@',
           dropdownOnchange: '&',
-          dropdownDisabled: '='
+          dropdownDisabled: '=',
+          dropdownMultiple: '='
         },
 
         controller: ['$scope', '$element', function ($scope, $element) {
@@ -156,18 +159,41 @@
           $wrap.append($element);
           $wrap.append($template);
 
+          if($scope.dropdownMultiple) {
+            $scope.dropdownModel.multiple = [];
+          }
+
           DropdownService.register(tpl);
 
           this.select = function (selected) {
-            if (!angular.equals(selected, $scope.dropdownModel)) {
+            if (!angular.equals(selected, $scope.dropdownModel) && !$scope.dropdownMultiple) {
                 $scope.dropdownModel = selected;
             }
+
+            if($scope.dropdownMultiple) {
+              var exists = -1;
+              for(var i = 0; i < $scope.dropdownModel.multiple.length; i++) {
+                if($scope.dropdownModel.multiple[i] === selected) {
+                  exists = i;
+                  break;
+                }
+              }
+              if(exists == -1) {
+                $scope.dropdownModel.multiple.push(selected);
+              } else {
+                $scope.dropdownModel.multiple.splice(exists, 1);
+              }
+            }
+
             $scope.dropdownOnchange({
               selected: selected
             });
+
+            console.log("SELECT 1");
           };
 
           $element.bind('click', function (event) {
+            console.log("CLICK 1");
             event.stopPropagation();
             if (!$scope.dropdownDisabled) {
               DropdownService.toggleActive(tpl);
@@ -175,6 +201,7 @@
           });
 
           $scope.$on('$destroy', function () {
+            console.log("DESTROY 1");
             DropdownService.unregister(tpl);
           });
         }]
@@ -200,6 +227,12 @@
             dropdownMenuCtrl.select(scope.dropdownMenuItem);
           };
         },
+
+        controller: ['$element', function ($element) {
+          $element.bind('click', function (event) {
+            event.stopPropagation();
+          })
+        }],
 
         templateUrl: 'ngDropdowns/templates/dropdownMenuItem.html'
       };

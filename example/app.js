@@ -74,4 +74,18 @@ app.controller('AppCtrl', function($scope) {
   ];
 
   $scope.ddMenuSelected3 = {};
+
+  $scope.ddMenuOptions4 = [
+    {
+      text: 'Option4-1'
+    }, {
+      text: 'Option4-2'
+    }, {
+      text: 'Option4-3'
+    }, {
+      text: 'Option4-4'
+    }
+  ];
+
+  $scope.ddMenuSelected4 = {};
 });
