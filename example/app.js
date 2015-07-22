@@ -26,6 +26,29 @@ app.controller('AppCtrl', function($scope) {
     text: "Select an Option"
   };
 
+  $scope.ddSelectOptions2 = [
+    {
+      text: 'Label',
+      divider: true
+    }, {
+      text: 'Option1',
+      value: 'one',
+      iconCls: 'someicon'
+    }, {
+      text: 'Option2',
+      someprop: 'somevalue'
+    }, {
+      divider: true
+    }, {
+      text: 'Option4',
+      href: 'http://www.google.com'
+    }
+  ];
+
+  $scope.ddSelectSelected2 = {
+    text: "Select an Option"
+  };
+
   $scope.ddMenuOptions = [
     {
       text: 'Label',

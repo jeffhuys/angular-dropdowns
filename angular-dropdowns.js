@@ -9,19 +9,21 @@
   dd.run(['$templateCache', function ($templateCache) {
     $templateCache.put('ngDropdowns/templates/dropdownSelect.html', [
       '<div ng-class="{\'disabled\': dropdownDisabled}" class="wrap-dd-select">',
-      '<span class="selected">{{dropdownModel[labelField]}}</span>',
+      '<span class="selected" ng-if="!dropdownMultiple">{{dropdownModel[labelField]}}</span>',
+      '<span class="selected" ng-if="dropdownMultiple">{{list(dropdownModel)}}</span>',
       '<ul class="dropdown">',
       '<li ng-repeat="item in dropdownSelect"',
       ' class="dropdown-item"',
       ' dropdown-select-item="item"',
-      ' dropdown-item-label="labelField">',
+      ' dropdown-item-label="labelField"',
+      ' dropdown-select-item-multiple="dropdownMultiple">',
       '</li>',
       '</ul>',
       '</div>'
     ].join(''));
 
     $templateCache.put('ngDropdowns/templates/dropdownSelectItem.html', [
-      '<li ng-class="{divider: (dropdownSelectItem.divider && !dropdownSelectItem[dropdownItemLabel]), \'divider-label\': (dropdownSelectItem.divider && dropdownSelectItem[dropdownItemLabel])}">',
+      '<li ng-class="{selected: dropdownSelectItem.selected, divider: (dropdownSelectItem.divider && !dropdownSelectItem[dropdownItemLabel]), \'divider-label\': (dropdownSelectItem.divider && dropdownSelectItem[dropdownItemLabel])}">',
       '<a href="" class="dropdown-item"',
       ' ng-if="!dropdownSelectItem.divider"',
       ' ng-href="{{dropdownSelectItem.href}}"',
@@ -39,13 +41,14 @@
       '<li ng-repeat="item in dropdownMenu"',
       ' class="dropdown-item"',
       ' dropdown-item-label="labelField"',
-      ' dropdown-menu-item="item">',
+      ' dropdown-menu-item="item"',
+      ' dropdown-menu-item-multiple="dropdownMultiple">',
       '</li>',
       '</ul>'
     ].join(''));
 
     $templateCache.put('ngDropdowns/templates/dropdownMenuItem.html', [
-      '<li ng-class="{divider: dropdownMenuItem.divider, \'divider-label\': dropdownMenuItem.divider && dropdownMenuItem[dropdownItemLabel]}">',
+      '<li ng-class="{divider: dropdownMenuItem.divider, \'divider-label\': dropdownMenuItem.divider && dropdownMenuItem[dropdownItemLabel], selected: dropdownMenuItem.selected}">',
       '<a href="" class="dropdown-item"',
       ' ng-if="!dropdownMenuItem.divider"',
       ' ng-href="{{dropdownMenuItem.href}}"',
@@ -70,26 +73,49 @@
           dropdownModel: '=',
           dropdownItemLabel: '@',
           dropdownOnchange: '&',
-          dropdownDisabled: '='
+          dropdownDisabled: '=',
+          dropdownMultiple: '=',
+          dropdownMultipleStandardLabel: '@'
         },
 
         controller: ['$scope', '$element', function ($scope, $element) {
           $scope.labelField = $scope.dropdownItemLabel || 'text';
 
+          if($scope.dropdownMultiple) {
+            $scope.dropdownModel = [];
+          }
+
           DropdownService.register($element);
 
           this.select = function (selected) {
-            console.log("SELECTED 2");
-            if (!angular.equals(selected, $scope.dropdownModel)) {
+            if (!angular.equals(selected, $scope.dropdownModel) && !$scope.dropdownMultiple) {
                 $scope.dropdownModel = selected;
             }
+
+            if($scope.dropdownMultiple) {
+              var exists = -1;
+              for(var i = 0; i < $scope.dropdownModel.length; i++) {
+                if($scope.dropdownModel[i] === selected) {
+                  exists = i;
+                  break;
+                }
+              }
+
+              if(exists == -1) {
+                selected.selected = true;
+                $scope.dropdownModel.push(selected);
+              } else {
+                selected.selected = false;
+                $scope.dropdownModel.splice(exists, 1);
+              }
+            }
+
             $scope.dropdownOnchange({
               selected: selected
             });
           };
 
           $element.bind('click', function (event) {
-            console.log("CLICK 2");
             event.stopPropagation();
             if (!$scope.dropdownDisabled) {
               DropdownService.toggleActive($element);
@@ -99,6 +125,14 @@
           $scope.$on('$destroy', function () {
             DropdownService.unregister($element);
           });
+
+          $scope.list = function() {
+            var returnString = "";
+            $scope.dropdownModel.forEach(function(obj) {
+              returnString += obj.text + ", ";
+            })
+            return returnString !== ""? returnString.substring(0, returnString.length - 2) : $scope.dropdownMultipleStandardLabel;
+          }
         }],
         templateUrl: 'ngDropdowns/templates/dropdownSelect.html'
       };
@@ -112,7 +146,8 @@
         replace: true,
         scope: {
           dropdownItemLabel: '=',
-          dropdownSelectItem: '='
+          dropdownSelectItem: '=',
+          dropdownSelectItemMultiple: '='
         },
 
         link: function (scope, element, attrs, dropdownSelectCtrl) {
@@ -123,6 +158,13 @@
             dropdownSelectCtrl.select(scope.dropdownSelectItem);
           };
         },
+
+        controller: ['$scope', '$element', function ($scope, $element) {
+          $element.bind('click', function (event) {
+            if($scope.dropdownSelectItemMultiple)
+              event.stopPropagation();
+          })
+        }],
 
         templateUrl: 'ngDropdowns/templates/dropdownSelectItem.html'
       };
@@ -160,7 +202,7 @@
           $wrap.append($template);
 
           if($scope.dropdownMultiple) {
-            $scope.dropdownModel.multiple = [];
+            $scope.dropdownModel = [];
           }
 
           DropdownService.register(tpl);
@@ -172,28 +214,28 @@
 
             if($scope.dropdownMultiple) {
               var exists = -1;
-              for(var i = 0; i < $scope.dropdownModel.multiple.length; i++) {
-                if($scope.dropdownModel.multiple[i] === selected) {
+              for(var i = 0; i < $scope.dropdownModel.length; i++) {
+                if($scope.dropdownModel[i] === selected) {
                   exists = i;
                   break;
                 }
               }
+
               if(exists == -1) {
-                $scope.dropdownModel.multiple.push(selected);
+                selected.selected = true;
+                $scope.dropdownModel.push(selected);
               } else {
-                $scope.dropdownModel.multiple.splice(exists, 1);
+                selected.selected = false;
+                $scope.dropdownModel.splice(exists, 1);
               }
             }
 
             $scope.dropdownOnchange({
               selected: selected
             });
-
-            console.log("SELECT 1");
           };
 
           $element.bind('click', function (event) {
-            console.log("CLICK 1");
             event.stopPropagation();
             if (!$scope.dropdownDisabled) {
               DropdownService.toggleActive(tpl);
@@ -201,7 +243,6 @@
           });
 
           $scope.$on('$destroy', function () {
-            console.log("DESTROY 1");
             DropdownService.unregister(tpl);
           });
         }]
@@ -216,7 +257,8 @@
         replace: true,
         scope: {
           dropdownMenuItem: '=',
-          dropdownItemLabel: '='
+          dropdownItemLabel: '=',
+          dropdownMenuItemMultiple: '='
         },
 
         link: function (scope, element, attrs, dropdownMenuCtrl) {
@@ -228,9 +270,10 @@
           };
         },
 
-        controller: ['$element', function ($element) {
+        controller: ['$scope', '$element', function ($scope, $element) {
           $element.bind('click', function (event) {
-            event.stopPropagation();
+            if($scope.dropdownMenuItemMultiple)
+              event.stopPropagation();
           })
         }],
 

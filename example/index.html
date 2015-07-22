@@ -19,9 +19,15 @@
         </button>
 
         <h1>Dropdown Select</h1>
-
+        
+        <h2>Single</h2>
         <p>You have selected: {{ddSelectSelected}}</p>
         <div dropdown-select="ddSelectOptions" dropdown-model="ddSelectSelected" dropdown-disabled="dropdownsDisabled"></div>
+
+        <h2>Multiple</h2>
+        <p>You have selected: {{ddSelectSelected2}}</p>
+        <div dropdown-select="ddSelectOptions2" dropdown-model="ddSelectSelected2" dropdown-disabled="dropdownsDisabled" dropdown-multiple="true" dropdown-multiple-standard-label="Select one or more"></div>
+
 
         <hr>
         
@@ -46,14 +52,11 @@
           Menu
         </a>
 
-        <hr>
-
-        <h1>Multiple selections</h1>
+        <h2>Multiple selections</h1>
         <p>You have selected: {{ddMenuSelected4}}</p>
         <button dropdown-menu="ddMenuOptions4" dropdown-model="ddMenuSelected4" dropdown-disabled="dropdownsDisabled" dropdown-multiple="true" class="btn-menu">
           Menu
         </button>
-        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
       </div>
     </div>
   </body>

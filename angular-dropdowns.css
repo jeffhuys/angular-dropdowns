@@ -98,6 +98,11 @@
   background: #f3f8f8;
 }
 
+.wrap-dd-select .dropdown li.selected {
+  background-color: #ffaaaa;
+  border-radius: 7px;
+}
+
 .wrap-dd-select .dropdown:after {
   content: "";
   width: 0;
@@ -165,6 +170,11 @@
   cursor: default;
   color: #000;
   padding: 10px 0;
+}
+
+.wrap-dd-menu .dropdown li.selected {
+  background-color: #ffaaaa;
+  border-radius: 7px;
 }
 
 .wrap-dd-menu .dropdown li a {
