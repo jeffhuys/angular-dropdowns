@@ -101,7 +101,7 @@
                 }
               }
 
-              if(exists == -1) {
+              if(exists === -1) {
                 selected.selected = true;
                 $scope.dropdownModel.push(selected);
               } else {
@@ -130,9 +130,9 @@
             var returnString = "";
             $scope.dropdownModel.forEach(function(obj) {
               returnString += obj.text + ", ";
-            })
+            });
             return returnString !== ""? returnString.substring(0, returnString.length - 2) : $scope.dropdownMultipleStandardLabel;
-          }
+          };
         }],
         templateUrl: 'ngDropdowns/templates/dropdownSelect.html'
       };
@@ -161,9 +161,10 @@
 
         controller: ['$scope', '$element', function ($scope, $element) {
           $element.bind('click', function (event) {
-            if($scope.dropdownSelectItemMultiple)
+            if($scope.dropdownSelectItemMultiple) {
               event.stopPropagation();
-          })
+            }
+          });
         }],
 
         templateUrl: 'ngDropdowns/templates/dropdownSelectItem.html'
@@ -221,7 +222,7 @@
                 }
               }
 
-              if(exists == -1) {
+              if(exists === -1) {
                 selected.selected = true;
                 $scope.dropdownModel.push(selected);
               } else {
@@ -272,9 +273,10 @@
 
         controller: ['$scope', '$element', function ($scope, $element) {
           $element.bind('click', function (event) {
-            if($scope.dropdownMenuItemMultiple)
+            if($scope.dropdownMenuItemMultiple) {
               event.stopPropagation();
-          })
+            }
+          });
         }],
 
         templateUrl: 'ngDropdowns/templates/dropdownMenuItem.html'
